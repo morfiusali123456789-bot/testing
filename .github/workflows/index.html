@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --red: #e8223a; --orange: #ff6b35; --dark: #0a0a0f; --card-bg: #111118; }
+  body { background: var(--dark); color: #fff; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(232,34,58,0.18) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+
+  .wrapper { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 40px 20px 60px; text-align: center; }
+
+  .logo-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; animation: fadeDown 0.6s ease both; }
+  .logo-icon { font-size: 2.2rem; }
+  .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 3px; background: linear-gradient(135deg, #ff4d6d, #ff6b35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .tagline { color: rgba(255,255,255,0.45); font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 36px; animation: fadeDown 0.6s 0.1s ease both; }
+
+  .btn-download {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, #e8223a, #ff6b35);
+    color: #fff; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.05rem;
+    padding: 16px 42px; border-radius: 50px; border: none; cursor: pointer;
+    box-shadow: 0 0 30px rgba(232,34,58,0.5), 0 4px 20px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeDown 0.6s 0.2s ease both, pulse 2.5s 1s infinite;
+    margin-bottom: 10px;
+  }
+  .btn-download:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 50px rgba(255,107,53,0.6), 0 8px 30px rgba(0,0,0,0.5); }
+  .btn-download:active { transform: scale(0.97); }
+  .btn-download:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .dl-status { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-bottom: 40px; min-height: 18px; animation: fadeDown 0.6s 0.25s ease both; }
+
+  .trending-label { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 2px; color: #fff; margin-bottom: 20px; animation: fadeUp 0.6s 0.3s ease both; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; animation: fadeUp 0.6s 0.4s ease both; }
+  .grid-item { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 3/4; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.07); cursor: pointer; }
+  .grid-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; display: block; }
+  .grid-item:hover img { transform: scale(1.07); }
+  .grid-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%); pointer-events: none; }
+
+  .glow-divider { width: 60px; height: 3px; background: linear-gradient(90deg, var(--red), var(--orange)); border-radius: 99px; margin: 40px auto 0; box-shadow: 0 0 12px rgba(232,34,58,0.7); }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(232,34,58,0.5), 0 4px 20px rgba(0,0,0,0.4); }
+    50%       { box-shadow: 0 0 55px rgba(255,107,53,0.7), 0 4px 20px rgba(0,0,0,0.4); }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="logo-row">
+    <span class="logo-icon">🔥</span>
+    <span class="logo-text">Private Access</span>
+  </div>
+  <p class="tagline">Exclusive Content · Members Only</p>
+
+  <button class="btn-download" id="dlBtn" onclick="startDownload()">
+    🔥 Download Our App
+  </button>
+  <p class="dl-status" id="dlStatus"></p>
+
+  <div class="trending-label">🔥 Trending Now</div>
+
+  <div class="grid">
+    <div class="grid-item"><img id="img1" src="https://placehold.co/300x400/1a1a2e/ff4d6d?text=1" alt="1"></div>
+    <div class="grid-item"><img id="img2" src="https://placehold.co/300x400/1a1a2e/ff6b35?text=2" alt="2"></div>
+    <div class="grid-item"><img id="img3" src="https://placehold.co/300x400/1a1a2e/e8223a?text=3" alt="3"></div>
+  </div>
+
+  <div class="glow-divider"></div>
+</div>
+
+<script>
+  // Load images from admin panel
+  const cfg = JSON.parse(localStorage.getItem('pa_cfg') || '{}');
+  if (cfg.img1) document.getElementById('img1').src = cfg.img1;
+  if (cfg.img2) document.getElementById('img2').src = cfg.img2;
+  if (cfg.img3) document.getElementById('img3').src = cfg.img3;
+
+  // APK URL stored by admin panel
+  const APK_URL = localStorage.getItem('pa_apk') || '';
+
+  function startDownload() {
+    if (!APK_URL) {
+      document.getElementById('dlStatus').textContent = '⚠️ Admin se pehle APK URL set karo';
+      return;
+    }
+
+    const btn = document.getElementById('dlBtn');
+    const status = document.getElementById('dlStatus');
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Starting...';
+    status.textContent = 'Download shuru ho rahi hai...';
+
+    // Direct force download
+    const a = document.createElement('a');
+    a.href = APK_URL;
+    a.download = 'PrivateAccess.apk';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '🔥 Download Our App';
+      status.textContent = '✅ Download shuru ho gayi!';
+    }, 2000);
+  }
+</script>
+</body>
+</html>
